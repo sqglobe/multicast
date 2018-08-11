@@ -3,7 +3,6 @@
 #include "servers_container.h"
 #include "server.h"
 
- #include <strings.h>
 #include <arpa/inet.h>
 #include <errno.h>
 #include <sys/select.h>
@@ -142,6 +141,7 @@ int start_server(const char * interfacem, int port, long wait){
 
 int send_init_message(int sockfd, const char * interfacem, int port, uint32_t identifier){
     struct sockaddr_in broadcast;    
+    int init_message = INIT_MESSAGE;
     int rc;
 
     char buff[sizeof (uint32_t) + sizeof (int)], *p = buff;
@@ -151,9 +151,14 @@ int send_init_message(int sockfd, const char * interfacem, int port, uint32_t id
     broadcast.sin_port = port;
     memset(buff, 0, sizeof (buff));
 
+    memcpy(p, &init_message, sizeof(int));
+    memcpy(p + sizeof (int),  &identifier, sizeof(uint32_t));
+
+    /*
     *((int*)p) = INIT_MESSAGE;
-    p += sizeof (int);
+    p += ;
     *((uint32_t*)p) = identifier;
+    */
 
     if(0 > sendto(sockfd, buff, sizeof (buff), 0, (struct sockaddr*)&broadcast, ADDR_LEN)) {
         printf("Failed set init message: %d\n", errno);
